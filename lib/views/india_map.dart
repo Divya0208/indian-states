@@ -34,7 +34,22 @@ class _IndiaMapState extends State<IndiaMap> {
   Widget build(BuildContext context) {
     Color prevSelectedColor;
     return Scaffold(
-      appBar: AppBar(title: Text("Indian States")),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Indian States",
+            style: TextStyle(
+                fontFamily: 'Courgette',
+                color: Colors.white,
+                fontSize: 35.0,
+                decoration: TextDecoration.none)),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[Colors.pink[200], Colors.purple])),
+        ),
+      ),
       body: StreamBuilder(
           initialData: Colors.green[500],
           stream: _stateController.stream,
@@ -55,21 +70,21 @@ class _IndiaMapState extends State<IndiaMap> {
                   child: Row(
                     children: <Widget>[
                       Expanded(
+                        flex: 6,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text(
-                                selectedState == null
-                                    ? 'Tap on a State'
-                                    : '${selectedState.name}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontFamily: 'Courgette',
-                                    color: Colors.black,
-                                    fontSize: 10.0,
-                                    decoration: TextDecoration.none),
-                                    
-                                  ),
+                              selectedState == null
+                                  ? 'Tap on a State'
+                                  : '${selectedState.name}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontFamily: 'Courgette',
+                                  color: Colors.black,
+                                  fontSize: 35.0,
+                                  decoration: TextDecoration.none),
+                            ),
                             SizedBox(height: 10.0),
                             Text(
                                 selectedState == null
@@ -79,28 +94,34 @@ class _IndiaMapState extends State<IndiaMap> {
                                 style: TextStyle(
                                     fontFamily: 'Courgette',
                                     color: Colors.black,
-                                    fontSize: 10.0,
+                                    fontSize: 22.0,
                                     decoration: TextDecoration.none)),
                           ],
                         ),
                       ),
                       Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 500),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return ScaleTransition(
-                              child: child,
-                              scale: animation,
-                            );
-                          },
-                          child: Image.asset(
-                            selectedState == null
-                                ? 'assets/empty.png'
-                                : '${selectedState.picturePath}',
-                            key: ValueKey(randomString(10)),
-                            fit: BoxFit.fill,
-                          ),
+                        flex: 4,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 500),
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                return ScaleTransition(
+                                  child: child,
+                                  scale: animation,
+                                );
+                              },
+                              child: Image.asset(
+                                selectedState == null
+                                    ? 'assets/empty.png'
+                                    : '${selectedState.picturePath}',
+                                key: ValueKey(randomString(10)),
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ],
                         ),
                       )
                     ],
