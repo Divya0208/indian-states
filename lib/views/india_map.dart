@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:india_map/views/state_view.dart';
-import 'package:india_map/modals/states_data.dart';
+import 'package:india_map/models/states_data.dart';
 
 class IndiaMap extends StatefulWidget {
-  static const id = 'mapOfIndia';
+  static const id = "mapOfIndia";
   @override
   _IndiaMapState createState() => _IndiaMapState();
 }
@@ -37,40 +36,97 @@ class _IndiaMapState extends State<IndiaMap> {
 
   @override
   Widget build(BuildContext context) {
+    double _width = 0.0;
+    double _height = 0.0;
+    final String title = useSnapshot ? "snapshot" : "basic";
+    Color prevSelectedColor;
     return Scaffold(
       appBar: AppBar(title: Text("Indian States")),
       body: StreamBuilder(
           initialData: Colors.green[500],
           stream: _stateController.stream,
           builder: (buildContext, snapshot) {
-            Color selectedColor = snapshot.data ?? Colors.white;
-
+            Color selectedColor = snapshot.data ?? Colors.green;
+            StateData selectedState;
+            if (prevSelectedColor != selectedColor) {
+              selectedState = IndianStates.singleWhere(
+                  (state) => state.colour == selectedColor,
+                  orElse: () => null);
+              prevSelectedColor = selectedColor;
+              if (selectedState != null) {
+                _width = 100.0;
+                _height = 100.0;
+              }
+            }
             return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Expanded(
-                  child: RepaintBoundary(
-                    key: paintKey,
-                    child: GestureDetector(
-                      onTapUp: (details) {
-                        searchPixel(details.globalPosition);
-                        StateData currentState = getState(selectedColor);
-                        if (currentState != null) {
-                          print(currentState.name);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      StateView(state: currentState)));
-                        }
-                      },
-                      child: Center(
-                        child: Image.asset(
-                          imagePath,
-                          key: imageKey,
-                          fit: BoxFit.cover,
+                  flex: 3,
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Text(
+                                selectedState == null
+                                    ? ''
+                                    : '${selectedState.name}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 30.0,
+                                    decoration: TextDecoration.none)),
+                            SizedBox(height: 10.0),
+                            Text(
+                                selectedState == null
+                                    ? ''
+                                    : '${selectedState.capital}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 30.0,
+                                    decoration: TextDecoration.none)),
+                          ],
                         ),
                       ),
-                    ),
+                      Expanded(
+                        child: AnimatedContainer(
+                          width: _width,
+                          height: _height,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                          ),
+                          duration: Duration(seconds: 1),
+                          curve: Curves.fastOutSlowIn,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 7,
+                  child: Stack(
+                    children: <Widget>[
+                      RepaintBoundary(
+                        key: paintKey,
+                        child: GestureDetector(
+                          onTapUp: (details) {
+                            _width = 100.0;
+                            _height = 100.0;
+                            searchPixel(details.globalPosition);
+                          },
+                          child: Center(
+                            child: Image.asset(
+                              imagePath,
+                              key: imageKey,
+                              fit: BoxFit.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -132,11 +188,4 @@ int abgrToArgb(int argbColor) {
   int r = (argbColor >> 16) & 0xFF;
   int b = argbColor & 0xFF;
   return (argbColor & 0xFF00FF00) | (b << 16) | r;
-}
-
-StateData getState(Color stateColor) {
-  StateData currentState = IndianStates.singleWhere(
-      (state) => state.colour == stateColor,
-      orElse: () => null);
-  return currentState;
 }
