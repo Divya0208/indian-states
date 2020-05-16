@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:india_map/models/states_data.dart';
+import 'package:random_string/random_string.dart';
 
 class IndiaMap extends StatefulWidget {
   static const id = "mapOfIndia";
@@ -17,12 +18,7 @@ class _IndiaMapState extends State<IndiaMap> {
   String imagePath = 'assets/IndiaMap.png';
   GlobalKey imageKey = GlobalKey();
   GlobalKey paintKey = GlobalKey();
-
-  // CHANGE THIS FLAG TO TEST BASIC IMAGE, AND SNAPSHOT.
   bool useSnapshot = true;
-
-  // based on useSnapshot=true ? paintKey : imageKey ;
-  // this key is used in this example to keep the code shorter.
   GlobalKey currentKey;
 
   final StreamController<Color> _stateController = StreamController<Color>();
@@ -36,9 +32,6 @@ class _IndiaMapState extends State<IndiaMap> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = 0.0;
-    double _height = 0.0;
-    final String title = useSnapshot ? "snapshot" : "basic";
     Color prevSelectedColor;
     return Scaffold(
       appBar: AppBar(title: Text("Indian States")),
@@ -53,10 +46,6 @@ class _IndiaMapState extends State<IndiaMap> {
                   (state) => state.colour == selectedColor,
                   orElse: () => null);
               prevSelectedColor = selectedColor;
-              if (selectedState != null) {
-                _width = 100.0;
-                _height = 100.0;
-              }
             }
             return Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,20 +60,24 @@ class _IndiaMapState extends State<IndiaMap> {
                           children: <Widget>[
                             Text(
                                 selectedState == null
-                                    ? ''
+                                    ? 'Tap on a State'
                                     : '${selectedState.name}',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
+                                    fontFamily: 'Courgette',
                                     color: Colors.black,
                                     fontSize: 10.0,
-                                    decoration: TextDecoration.none)),
+                                    decoration: TextDecoration.none),
+                                    
+                                  ),
                             SizedBox(height: 10.0),
                             Text(
                                 selectedState == null
                                     ? ''
-                                    : '${selectedState.capital}',
+                                    : 'Capital : ${selectedState.capital}',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
+                                    fontFamily: 'Courgette',
                                     color: Colors.black,
                                     fontSize: 10.0,
                                     decoration: TextDecoration.none)),
@@ -92,44 +85,42 @@ class _IndiaMapState extends State<IndiaMap> {
                         ),
                       ),
                       Expanded(
-                        child: Center(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(seconds: 1),
-                                child: Image.asset(
-                                selectedState == null
-                                      ? 'assets/empty.png'
-                                      : '${selectedState.picturePath}',
-                                key: imageKey,
-                                fit: BoxFit.none,
-                              ),
-                            ),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                              child: child,
+                              scale: animation,
+                            );
+                          },
+                          child: Image.asset(
+                            selectedState == null
+                                ? 'assets/empty.png'
+                                : '${selectedState.picturePath}',
+                            key: ValueKey(randomString(10)),
+                            fit: BoxFit.fill,
                           ),
+                        ),
                       )
                     ],
                   ),
                 ),
                 Expanded(
                   flex: 7,
-                  child: Stack(
-                    children: <Widget>[
-                      RepaintBoundary(
-                        key: paintKey,
-                        child: GestureDetector(
-                          onTapUp: (details) {
-                            _width = 100.0;
-                            _height = 100.0;
-                            searchPixel(details.globalPosition);
-                          },
-                          child: Center(
-                            child: Image.asset(
-                              imagePath,
-                              key: imageKey,
-                              fit: BoxFit.none,
-                            ),
-                          ),
+                  child: RepaintBoundary(
+                    key: paintKey,
+                    child: GestureDetector(
+                      onTapUp: (details) {
+                        searchPixel(details.globalPosition);
+                      },
+                      child: Center(
+                        child: Image.asset(
+                          imagePath,
+                          fit: BoxFit.none,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -186,7 +177,6 @@ class _IndiaMapState extends State<IndiaMap> {
   }
 }
 
-// image lib uses uses KML color format, convert #AABBGGRR to regular #AARRGGBB
 int abgrToArgb(int argbColor) {
   int r = (argbColor >> 16) & 0xFF;
   int b = argbColor & 0xFF;
