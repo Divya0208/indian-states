@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'views/india_map.dart';
-import 'views/state_view.dart';
-import 'package:india_map/models/states_data.dart';
 
 void main() {
   runApp(MyApp());

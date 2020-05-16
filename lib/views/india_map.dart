@@ -76,7 +76,7 @@ class _IndiaMapState extends State<IndiaMap> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 30.0,
+                                    fontSize: 10.0,
                                     decoration: TextDecoration.none)),
                             SizedBox(height: 10.0),
                             Text(
@@ -86,21 +86,21 @@ class _IndiaMapState extends State<IndiaMap> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 30.0,
+                                    fontSize: 10.0,
                                     decoration: TextDecoration.none)),
                           ],
                         ),
                       ),
                       Expanded(
-                        child: AnimatedContainer(
-                          width: _width,
-                          height: _height,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
+                        child: Center(
+                            child: Image.asset(
+                              selectedState == null
+                                    ? 'assets/empty.png'
+                                    : '${selectedState.picturePath}',
+                              key: imageKey,
+                              fit: BoxFit.none,
+                            ),
                           ),
-                          duration: Duration(seconds: 1),
-                          curve: Curves.fastOutSlowIn,
-                        ),
                       )
                     ],
                   ),
