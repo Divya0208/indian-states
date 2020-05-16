@@ -93,12 +93,15 @@ class _IndiaMapState extends State<IndiaMap> {
                       ),
                       Expanded(
                         child: Center(
-                            child: Image.asset(
-                              selectedState == null
-                                    ? 'assets/empty.png'
-                                    : '${selectedState.picturePath}',
-                              key: imageKey,
-                              fit: BoxFit.none,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(seconds: 1),
+                                child: Image.asset(
+                                selectedState == null
+                                      ? 'assets/empty.png'
+                                      : '${selectedState.picturePath}',
+                                key: imageKey,
+                                fit: BoxFit.none,
+                              ),
                             ),
                           ),
                       )
